@@ -2,7 +2,7 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import typeDefs from "./graphql/typeDef";
 import resolvers from "./graphql/resolvers";
-import { connectToDatabase } from "./config/db";
+import knexDB from "./config/db";
 
 const server = new ApolloServer({
   typeDefs,
@@ -10,10 +10,11 @@ const server = new ApolloServer({
 });
 
 const startServer = async () => {
-  await connectToDatabase(); // Wait for the database connection to be established
+  // Wait for the database connection to be established
   const { url } = await startStandaloneServer(server, {
     listen: { port: 5000 },
   });
+
   console.log("Server listening at", url);
 };
 

@@ -1,30 +1,63 @@
-// Import the mysql2 pool
-import { pool } from "../config/db";
-import { format } from "date-fns";
+import knex from "../config/db"; // Import your Knex instance
+import bcrypt from "bcrypt";
 
-// Function to create a new user
+interface User {
+  id: number; // Adjust the type as per your user ID type
+  username: string;
+  password: string;
+  role: string;
+  createdAt: Date;
+}
+
 const createUser = async (
   _: any,
-  { username, password }: { username: string; password: string | null }
-) => {
+  {
+    username,
+    password,
+    role,
+  }: { username: string; password: string; role: string }
+): Promise<User> => {
   try {
+    const existingUser = await knex("user").where({ username }).first();
+
+    if (existingUser) {
+      console.log(existingUser, "exist user");
+      throw new Error("Username already exists. Choose a different username.");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create a new user with the current timestamp for createdAt
-    const createdAt = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    const createdAt = new Date();
 
-    password = password || null;
-    // Execute the INSERT query
-    const query =
-      "INSERT INTO user (username, password, createdAt) VALUES (?, ?, ?)";
-    await pool.promise().execute(query, [username, password, createdAt]);
+    // Use Knex to insert the user data into the database
+    const result = await knex.transaction(async (trx) => {
+      const [userId] = await trx("user").insert({
+        username,
+        password: hashedPassword,
+        role,
+        createdAt,
+      });
 
-    // If execution completes without errors, the user has been created.
-    return {
-      username,
-      createdAt,
-    };
+      return userId;
+    });
+
+    if (result) {
+      const user: User = {
+        id: result,
+        username,
+        password: hashedPassword,
+        role,
+        createdAt,
+      };
+      console.log(user);
+      return user;
+    } else {
+      throw new Error("Failed to create a user");
+    }
   } catch (error: any) {
     console.error("Error creating user:", error.message);
-    throw new Error("Failed to create a user");
+    throw Error("Failed to create a user");
   }
 };
 

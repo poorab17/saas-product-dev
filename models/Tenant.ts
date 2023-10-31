@@ -1,25 +1,26 @@
-//models/user.ts
-
-class User {
+class Tenant {
   id!: number;
+  name!: string;
   username!: string;
   password!: string;
+  description?: string;
   role!: string;
-  createdAt: Date;
 
   constructor(
     id: number,
+    name: string,
     username: string,
     password: string,
     role: string,
-    createdAt: Date
+    description?: string
   ) {
     this.id = id;
+    this.name = name;
     this.username = username;
     this.password = password;
-    this.createdAt = createdAt;
     this.role = role;
+    this.description = description;
   }
 }
 
-export { User };
+export { Tenant };
