@@ -1,0 +1,160 @@
+knex init
+
+knex migrate:make create_tenant_table
+knex migrate:make create_tenant_table -x ts
+
+knex migrate:latest
+
+ knex migrate:up 20231031090258_create_tenant_table.ts
+
+ server\db\migrations\20231031092156_create_tenant_table.ts
+
+
+ server\db\migrations\20231031093357_create_tenant_table2.ts
+
+server\db\migrations\20231031101528_create_tenant_table.ts
+
+
+module.exports = {
+  development: {
+    client: "mysql2",
+    connection: {
+      host: "localhost",
+      user: "root",
+      password: "root",
+      database: "saas-product",
+    },
+    migrations: {
+      directory: "./db/migrations",
+    },
+    seeds: {
+      directory: "./db/seeds",
+    },
+  },
+  // Add more configurations for other environments if needed (e.g., production, test).
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Request, Response } from "express";
+import knex from "knex"; // Assuming you have your Knex configuration correctly set up
+import bcrypt from "bcrypt";
+import { Tenant } from "../models/Tenant"; // Import your Tenant model
+import path from "path";
+
+class TenantController {
+  async createTenant(args: {
+    name: string;
+    username: string;
+    password: string;
+    role: string;
+    description: string;
+  }) {
+    try {
+      const { name, username, password, role, description } = args;
+
+      // Generate a database name based on the tenant's name
+      const dbName = name.toLowerCase().replace(/[^a-zA-Z0-9]/g, "_");
+
+      const systemDB = knex({
+        client: "mysql2",
+        connection: {
+          host: "localhost",
+          user: "root",
+          password: "root",
+          database: "saas-product", // Replace with your system database name
+        },
+      });
+
+      await systemDB.raw(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
+
+      // Create a Knex instance for the tenant's database
+      const tenantDB = knex({
+        client: "mysql2",
+        connection: {
+          host: "localhost",
+          user: "root",
+          password: "root",
+          database: dbName,
+        },
+      });
+      await tenantDB.raw("SELECT 1");
+      console.log("Tenant Database connected successfully");
+
+      //   await tenantDB.migrate.up();
+
+      // // Use the main database connection to create the tenant's database
+      // await tenantDB.raw(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
+
+      // / Switch to the tenant's database for further operations
+      // await tenantDB.raw(`USE ${dbName}`);
+
+      const migrationFilePath = path.join(
+        __dirname,
+        "db",
+        "migrations",
+        "20231031125737_create_tenant_table10.ts"
+      );
+
+      await tenantDB.migrate.up({
+        tableName: "knex_migrations",
+        loadExtensions: [".ts"],
+        directory: migrationFilePath, // Pass the migration file path
+      });
+
+      // const tableExists = await tenantDB.schema.hasTable("tenant");
+      // if (!tableExists) {
+      //   // Run the migration to create the 'tenant' table
+      //   await tenantDB.migrate.latest();
+      // }
+
+      // Check if the tenant already exists in the tenant's database
+      // const existingTenant = await tenantDB("tenant")
+      //   .where({ username })
+      //   .first();
+
+      // if (existingTenant) {
+      //   throw new Error(
+      //     "Tenant username already exists. Choose a different username."
+      //   );
+      // }
+      // Hash the password using bcrypt
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create a new tenant record using your Tenant model
+      const newTenant = new Tenant(
+        0,
+        name,
+        username,
+        hashedPassword,
+        role,
+        description
+      );
+
+      // Insert the tenant record into the 'tenant' table
+      const tenantId = await tenantDB("tenant").insert(newTenant);
+      if (tenantId.length === 0) {
+        throw new Error(
+          "Failed to insert tenant data into the 'tenant' table."
+        );
+      }
+      return { message: "Tenant and database created successfully" };
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+}
+
+export default new TenantController();
