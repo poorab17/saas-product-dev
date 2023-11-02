@@ -4,6 +4,11 @@ import { User } from "../models/User";
 import createUser from "../controller/user";
 import { login } from "../controller/auth";
 import TenantController from "../controller/Tenant";
+import checkRole from "../middleware/checkRole";
+
+type ResolverContext = {
+  req: any; // Replace with the actual request context type
+};
 
 const resolvers = {
   Mutation: {
@@ -21,23 +26,26 @@ const resolvers = {
       }
     },
 
-    createTenant: async (
-      _: any,
-      args: {
-        name: string;
-        username: string;
-        password: string;
-        role: string;
-        description: string;
+    createTenant: checkRole(["superadmin"])(
+      async (
+        _: any,
+        args: {
+          name: string;
+          username: string;
+          password: string;
+          role: string;
+          description: string;
+        },
+        context: ResolverContext
+      ) => {
+        try {
+          const result = await TenantController.createTenant(args);
+          return result;
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
       }
-    ) => {
-      try {
-        const result = await TenantController.createTenant(args);
-        return result;
-      } catch (error: any) {
-        throw new Error(error.message);
-      }
-    },
+    ),
   },
 
   Query: {

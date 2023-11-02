@@ -158,3 +158,33 @@ class TenantController {
 }
 
 export default new TenantController();
+
+
+
+
+// interface MyContext {
+//   authScope: string | null; // Adjust the type as per your context structure
+// }
+
+// const context = async ({ req }: { req: Request }): Promise<MyContext> => {
+//   const authorizationHeader = req.headers.authorization;
+
+//   // Check if the authorization header is provided
+//   if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+//     return { authScope: null }; // User is not authenticated
+//   }
+
+//   const token = authorizationHeader.replace("Bearer ", "");
+
+//   // Verify the JWT token
+//   const decodedToken = verifyToken(token);
+
+//   if (!decodedToken) {
+//     return { authScope: null }; // Token is not valid
+//   }
+
+//   // Retrieve the user's role from the decoded token
+//   const authScope = getUserRole(decodedToken);
+
+//   return { authScope };
+// };

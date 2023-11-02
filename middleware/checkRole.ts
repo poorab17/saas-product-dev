@@ -1,34 +1,30 @@
-// src/middleware/checkRole.ts
+// // src/middleware/checkRole.ts
 
-import { AuthenticationError, ForbiddenError } from "apollo-server";
+// import { AuthenticationError } from "apollo-server";
+import { GraphQLError } from "graphql";
 import jwt from "jsonwebtoken";
 import { jwtSecret } from "../config/auth";
-import { User } from "../models/User";
-import { Tenant } from "../models/Tenant";
-import { Request } from "express";
 
-const checkRole = (roles: string[]) => async (req: Request, context: any) => {
-  const authorizationHeader = req.headers.authorization;
+const checkRole =
+  (requiredRoles: string[]) =>
+  (resolverFunction: any) =>
+  async (parent: any, args: any, context: any, info: any) => {
+    console.log(requiredRoles, "requireed role");
+    console.log(context.authScope, "from app");
 
-  if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
-    throw new AuthenticationError("Authentication failed. Token not found.");
-  }
-
-  const token = authorizationHeader.replace("Bearer ", "");
-
-  if (!token) {
-    throw new AuthenticationError("Authentication failed. Token not found.");
-  }
-
-  try {
-    const decoded: any = jwt.verify(token, jwtSecret);
-
-    if (!roles.includes(decoded.role)) {
-      throw new AuthenticationError("Insufficient role privileges.");
+    if (!context.authScope) {
+      throw new GraphQLError("Authentication failed. Token not found.");
     }
-  } catch (error) {
-    throw new AuthenticationError("Authentication failed. Token is not valid.");
-  }
-};
+
+    if (!requiredRoles.includes(context.authScope)) {
+      throw new GraphQLError("You are not authorized to perform this action.", {
+        extensions: {
+          code: "FORBIDDEN",
+        },
+      });
+    }
+
+    return resolverFunction(parent, args, context, info);
+  };
 
 export default checkRole;

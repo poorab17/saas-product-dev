@@ -39,3 +39,17 @@ export const login = async (username: string, password: string) => {
     throw error;
   }
 };
+
+// Function to verify a JWT token
+export const verifyToken = (token: string) => {
+  try {
+    return jwt.verify(token, jwtSecret);
+  } catch (error) {
+    return null; // Token is not valid
+  }
+};
+
+// Function to retrieve the user's role from a decoded token
+export const getUserRole = (decodedToken: any) => {
+  return decodedToken.role;
+};
