@@ -1,3 +1,5 @@
+//models/Tenant
+
 class Tenant {
   id!: number;
   name!: string;
@@ -5,6 +7,7 @@ class Tenant {
   password!: string;
   description?: string;
   role!: string;
+  document?: string;
 
   constructor(
     id: number,
@@ -12,7 +15,8 @@ class Tenant {
     username: string,
     password: string,
     role: string,
-    description?: string
+    description?: string,
+    document?: string
   ) {
     this.id = id;
     this.name = name;
@@ -20,6 +24,7 @@ class Tenant {
     this.password = password;
     this.role = role;
     this.description = description;
+    this.document = document;
   }
 }
 

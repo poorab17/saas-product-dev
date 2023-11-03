@@ -3,6 +3,7 @@
 import gql from "@apollo/server";
 
 const typeDefs = `
+
   type User {
     id: ID!
     username: String!

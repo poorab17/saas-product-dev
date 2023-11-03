@@ -2,8 +2,6 @@
 
 // import { AuthenticationError } from "apollo-server";
 import { GraphQLError } from "graphql";
-import jwt from "jsonwebtoken";
-import { jwtSecret } from "../config/auth";
 
 const checkRole =
   (requiredRoles: string[]) =>

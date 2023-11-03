@@ -1,3 +1,5 @@
+//controller/Tenant
+
 import { Request, Response } from "express";
 import knex, { Knex } from "knex"; // Assuming you have your Knex configuration correctly set up
 import bcrypt from "bcrypt";
