@@ -10,10 +10,6 @@ const typeDefs = `
     password: String!
     role:String!
   }
- type AuthPayload {
-    user: User
-    token: String
-  }
 
     type Tenant {
     id: ID!
@@ -23,6 +19,44 @@ const typeDefs = `
     description: String
     role: String!
   }
+
+   type Subadmin {
+    id: ID!
+    name: String!
+    username: String!
+    password: String!
+    role: String!
+    permissions: [String]!
+    reporting: String!
+  }
+
+   type AuthPayload {
+    user: User
+    tenant:Tenant
+    token: String
+  }
+
+   input CompetitionInput {
+    category: String!
+    name: String!
+    code: String!
+    place: String!
+    fromDate: String!
+    toDate: String!
+    conductedBy: String!
+  }
+
+type Competition {
+  id: ID!
+  category: String!
+  name: String!
+  code: String!
+  place: String!
+  fromDate: String!
+  toDate: String!
+  conductedBy: String!
+  createdAt:String
+}
 
   type Mutation {
     createUser(username: String!, password: String!,role:String!): User
@@ -34,10 +68,24 @@ const typeDefs = `
       role: String!
       description: String
     ): Tenant
+
+     createSubadmin(
+      name: String!
+      username: String!
+      password: String!
+      role: String!
+      permissions: [String]!
+      reporting: String!
+    ): Subadmin
+
+     createCompetition(data: CompetitionInput): Competition
+    updateCompetition(id: ID!, data: CompetitionInput): Competition
+    deleteCompetition(id: ID!): Competition
   }
 
   type Query {
     hello: String
+     getCompetitions: [Competition] 
   }
 `;
 

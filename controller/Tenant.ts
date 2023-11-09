@@ -85,10 +85,16 @@ class TenantController {
       );
 
       const tenantId = await tenantDB("tenant").insert(newTenant);
+      const tenantinfo = await systemDB("tenant").insert(newTenant);
 
       if (tenantId.length === 0) {
         throw new Error(
           "Failed to insert tenant data into the 'tenant' table."
+        );
+      }
+      if (tenantinfo.length === 0) {
+        throw new Error(
+          "Failed to insert tenant data into the 'tenant_info' table."
         );
       }
 

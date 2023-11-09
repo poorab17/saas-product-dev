@@ -1,12 +1,14 @@
-//models/Tenant
+// models/Subadmin.ts
 
-class Tenant {
-  id!: number;
+class Subadmin {
+  id?: number;
   name!: string;
   username!: string;
   password!: string;
-  description?: string;
   role!: string;
+  permissions: string[] = [];
+  reporting!: string;
+  // Add other fields as needed
 
   constructor(
     id: number,
@@ -14,15 +16,18 @@ class Tenant {
     username: string,
     password: string,
     role: string,
-    description?: string
+    permissions: string[],
+    reporting: string
   ) {
     this.id = id;
     this.name = name;
     this.username = username;
     this.password = password;
     this.role = role;
-    this.description = description;
+    this.permissions = permissions;
+    this.reporting = reporting;
+    // Initialize other fields here
   }
 }
 
-export { Tenant };
+export { Subadmin };

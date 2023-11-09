@@ -8,13 +8,13 @@ const checkRole =
   (resolverFunction: any) =>
   async (parent: any, args: any, context: any, info: any) => {
     console.log(requiredRoles, "requireed role");
-    console.log(context.authScope, "from app");
+    console.log(context.authScope.role, "from app");
 
     if (!context.authScope) {
       throw new GraphQLError("Authentication failed. Token not found.");
     }
 
-    if (!requiredRoles.includes(context.authScope)) {
+    if (!requiredRoles.includes(context.authScope.role)) {
       throw new GraphQLError("You are not authorized to perform this action.", {
         extensions: {
           code: "FORBIDDEN",

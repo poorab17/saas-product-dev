@@ -15,16 +15,18 @@ const startServer = async () => {
   const { url } = await startStandaloneServer(server, {
     context: async ({ req }) => {
       const token = req.headers?.authorization;
-      console.log(token);
+      // console.log(token);
       let authScope = null; // Default value when the user is not authenticated
 
       if (token) {
         // Verify the JWT token
         const decodedToken = verifyToken(token);
-        console.log(decodedToken);
+        // console.log(decodedToken, "decoded");
         if (decodedToken) {
           // Retrieve the user's role from the decoded token
-          authScope = getUserRole(decodedToken);
+          const { role, username } = getUserRole(decodedToken);
+          authScope = { role, username };
+          //  console.log(authScope, "authscope");
         }
       }
 
