@@ -30,6 +30,12 @@ const typeDefs = `
     reporting: String!
   }
 
+  type Module{
+     id: ID!
+    ModuleName:String!
+    Routes:[String]!
+  }
+
    type AuthPayload {
     user: User
     tenant:Tenant
@@ -68,6 +74,12 @@ type Competition {
       role: String!
       description: String
     ): Tenant
+
+createModule(
+    ModuleName:String!
+    Routes:[String]!
+    ):Module 
+
 
      createSubadmin(
       name: String!

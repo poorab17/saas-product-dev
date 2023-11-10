@@ -2,8 +2,6 @@ import knex from "knex";
 
 const environment = process.env.NODE_ENV || "development"; // You can set the NODE_ENV environment variable to specify the environment
 const knexConfig = require("../knexfile")[environment];
-
-// Create a Knex instance using the configuration
 const knexDB = knex(knexConfig);
 
 // Function to connect to the database

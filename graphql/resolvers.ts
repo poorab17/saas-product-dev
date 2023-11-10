@@ -6,6 +6,7 @@ import axios from "axios";
 import createUser from "../controller/user";
 import { login } from "../controller/auth";
 import TenantController from "../controller/Tenant";
+import ModuleController from "../controller/module";
 import checkRole from "../middleware/checkRole";
 import SubadminService from "../controller/subadmin";
 
@@ -52,6 +53,25 @@ const resolvers = {
       }
     ),
 
+    createModule: checkRole(["superadmin"])(
+      async (
+        _: any,
+        args: {
+          ModuleName: string;
+          Routes: string[];
+        },
+        context: ResolverContext
+      ) => {
+        try {
+          const result = await ModuleController.createModule(args);
+          console.log(result);
+          return result;
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+
     createSubadmin: checkRole(["tenant"])(
       async (
         _: any,
@@ -67,6 +87,7 @@ const resolvers = {
       ) => {
         try {
           // Get the authenticated tenant's username from the context (assuming you have authentication implemented)
+
           const subadminData = {
             name: args.name,
             username: args.username,
